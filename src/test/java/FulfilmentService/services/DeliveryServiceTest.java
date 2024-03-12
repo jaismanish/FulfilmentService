@@ -55,5 +55,4 @@ class DeliveryServiceTest {
         assertThrows(OrderAlreadyProcessedException.class, () -> deliveryService.process(request));
         verify(userRepository, never()).findAll();
     }
-
 }

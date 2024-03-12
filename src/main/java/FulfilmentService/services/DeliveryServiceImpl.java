@@ -2,11 +2,12 @@ package FulfilmentService.services;
 
 import FulfilmentService.dto.Address;
 import FulfilmentService.dto.ApiResponse;
+import FulfilmentService.dto.DeliveryResponse;
 import FulfilmentService.entities.Delivery;
 import FulfilmentService.entities.User;
+import FulfilmentService.enums.DeliveryStatus;
 import FulfilmentService.enums.DeliveryValetAvailability;
-import FulfilmentService.exceptions.OrderAlreadyProcessedException;
-import FulfilmentService.exceptions.NoDeliveryValetFoundNearbyException;
+import FulfilmentService.exceptions.*;
 import FulfilmentService.models.DeliveryRequest;
 import FulfilmentService.repositories.DeliveryRepository;
 import FulfilmentService.repositories.UserRepository;
@@ -14,8 +15,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,8 +30,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DeliveryServiceImpl implements DeliveryService{
 
+    @Autowired
     private DeliveryRepository deliveryRepository;
+    @Autowired
     private final UserRepository userRepository;
+    @Autowired
     private final RestTemplate restTemplate;
 
     @Override
@@ -57,6 +64,40 @@ public class DeliveryServiceImpl implements DeliveryService{
                 .message("Delivery Processed")
                 .status(HttpStatus.CREATED)
                 .data(Map.of("delivery", delivery))
+                .build();
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse> updateStatus(String deliveryId) throws DeliveryNotFoundException {
+        Delivery delivery = deliveryRepository.findById(deliveryId)
+                .orElseThrow(DeliveryNotFoundException::new);
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+
+        isRespectiveExecutive(delivery, user);
+
+        DeliveryStatus status = delivery.getStatus();
+
+        isAlreadyDelivered(status);
+
+        if (status.equals(DeliveryStatus.PICKED_UP)) {
+            delivery.setStatus(DeliveryStatus.DELIVERED);
+            user.setAddress(delivery.getDeliveryAddress());
+            user.setAvailability(DeliveryValetAvailability.AVAILABLE);
+        } else {
+            delivery.setStatus(DeliveryStatus.PICKED_UP);
+            user.setAddress(delivery.getPickupAddress());
+        }
+        deliveryRepository.save(delivery);
+        userRepository.save(user);
+
+        ApiResponse response = ApiResponse.builder()
+                .message("Status Updated" + delivery.getStatus().toString())
+                .status(HttpStatus.OK)
+                .data(Map.of("delivery", new DeliveryResponse(delivery)))
                 .build();
 
         return ResponseEntity.status(response.getStatus()).body(response);
@@ -123,6 +164,18 @@ public class DeliveryServiceImpl implements DeliveryService{
         double c = Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
         return EARTH_RADIUS * c;
+    }
+
+    private static void isRespectiveExecutive(Delivery delivery, User user) {
+        if (!delivery.getUser().equals(user)) {
+            throw new UnauthorizedStatusUpdateException();
+        }
+    }
+
+    private static void isAlreadyDelivered(DeliveryStatus status) {
+        if (status.equals(DeliveryStatus.DELIVERED)) {
+            throw new OrderAlreadyDeliveredException();
+        }
     }
 
 }
