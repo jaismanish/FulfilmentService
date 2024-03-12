@@ -1,14 +1,22 @@
 package FulfilmentService.services;
 
 import FulfilmentService.dto.ApiResponse;
+import FulfilmentService.entities.User;
 import FulfilmentService.models.RegistrationRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Map;
 
 public class UserServiceImpl implements UserService{
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserRepository userRepository;
+
     @Override
     public ResponseEntity<ApiResponse> register(RegistrationRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
