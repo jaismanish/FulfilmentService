@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public ResponseEntity<ApiResponse> register(RegistrationRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
+        if (userRepository.isPresentByUsername(request.getUsername())) {
             throw new UserAlreadyRegistered();
         }
 
