@@ -5,7 +5,7 @@ import FulfilmentService.dto.ApiResponse;
 import FulfilmentService.entities.Delivery;
 import FulfilmentService.entities.User;
 import FulfilmentService.enums.DeliveryValetAvailability;
-import FulfilmentService.exceptions.DeliveryValetAssignedException;
+import FulfilmentService.exceptions.OrderAlreadyProcessedException;
 import FulfilmentService.exceptions.NoDeliveryValetFoundNearbyException;
 import FulfilmentService.models.DeliveryRequest;
 import FulfilmentService.repositories.DeliveryRepository;
@@ -14,7 +14,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -34,7 +33,7 @@ public class DeliveryServiceImpl implements DeliveryService{
     @Override
     public ResponseEntity<ApiResponse> process(DeliveryRequest request) throws NoDeliveryValetFoundNearbyException, JsonProcessingException {
         if (deliveryRepository.isPresentByOrderId(request.getOrderId())) {
-            throw new DeliveryValetAssignedException();
+            throw new OrderAlreadyProcessedException();
         }
 
         User nearestExecutive = this.getNearestAvailableExecutive(request.getPickupAddress());

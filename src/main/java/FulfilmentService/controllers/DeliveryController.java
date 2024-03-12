@@ -1,6 +1,7 @@
 package FulfilmentService.controllers;
 
 import FulfilmentService.dto.ApiResponse;
+import FulfilmentService.exceptions.NoDeliveryValetFoundNearbyException;
 import FulfilmentService.models.DeliveryRequest;
 import FulfilmentService.services.DeliveryService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,7 +16,7 @@ public class DeliveryController {
     private final DeliveryService deliveryService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse> process(@RequestBody DeliveryRequest request) throws JsonProcessingException {
+    public ResponseEntity<ApiResponse> process(@RequestBody DeliveryRequest request) throws JsonProcessingException, NoDeliveryValetFoundNearbyException {
         return this.deliveryService.process(request);
     }
 
