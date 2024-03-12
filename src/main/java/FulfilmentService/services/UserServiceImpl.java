@@ -1,8 +1,11 @@
 package FulfilmentService.services;
 
 import FulfilmentService.dto.ApiResponse;
+import FulfilmentService.dto.UserResponse;
 import FulfilmentService.entities.User;
+import FulfilmentService.exceptions.UserAlreadyRegistered;
 import FulfilmentService.models.RegistrationRequest;
+import FulfilmentService.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +23,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public ResponseEntity<ApiResponse> register(RegistrationRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new UserAlreadyExistsException();
+            throw new UserAlreadyRegistered();
         }
 
         User user = User.builder()
