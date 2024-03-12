@@ -20,7 +20,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-public class Security {
+public class SecurityConfig {
     @Autowired
     private AuthenticationProvider authProvider;
 
