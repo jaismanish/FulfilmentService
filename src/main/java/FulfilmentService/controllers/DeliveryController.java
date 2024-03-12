@@ -1,6 +1,7 @@
 package FulfilmentService.controllers;
 
 import FulfilmentService.dto.ApiResponse;
+import FulfilmentService.exceptions.DeliveryNotFoundException;
 import FulfilmentService.exceptions.NoDeliveryValetFoundNearbyException;
 import FulfilmentService.models.DeliveryRequest;
 import FulfilmentService.services.DeliveryService;
@@ -18,6 +19,11 @@ public class DeliveryController {
     @PostMapping
     public ResponseEntity<ApiResponse> process(@RequestBody DeliveryRequest request) throws JsonProcessingException, NoDeliveryValetFoundNearbyException {
         return this.deliveryService.process(request);
+    }
+
+    @PutMapping("/{deliveryId}")
+    public ResponseEntity<ApiResponse> updateStatus(@PathVariable(value = "deliveryId") String deliveryId) throws DeliveryNotFoundException {
+        return this.deliveryService.updateStatus(deliveryId);
     }
 
 }
