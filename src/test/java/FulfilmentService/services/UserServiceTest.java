@@ -2,6 +2,7 @@ package FulfilmentService.services;
 
 import FulfilmentService.dto.Address;
 import FulfilmentService.dto.ApiResponse;
+import FulfilmentService.exceptions.UserAlreadyRegistered;
 import FulfilmentService.models.RegistrationRequest;
 import FulfilmentService.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,12 +57,22 @@ class UserServiceTest {
     void testRegisterUserSuccessfully() {
         when(userRepository.existsByUsername(registrationRequest.getUsername())).thenReturn(false);
         when(passwordEncoder.encode(registrationRequest.getPassword())).thenReturn(anyString());
+
         ResponseEntity<ApiResponse> response = userService.register(registrationRequest);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals("User Registered Successfully", Objects.requireNonNull(response.getBody()).getMessage());
         verify(userRepository, times(1)).existsByUsername(registrationRequest.getUsername());
         verify(passwordEncoder, times(1)).encode(registrationRequest.getPassword());
+    }
+
+    @Test
+    void test_cannotSaveUserWithRegisteredUsername_throwsException() {
+        when(userRepository.existsByUsername(registrationRequest.getUsername())).thenReturn(true);
+
+        assertThrows(UserAlreadyRegistered.class, () -> userService.register(registrationRequest));
+        verify(userRepository, times(1)).existsByUsername(registrationRequest.getUsername());
+        verify(passwordEncoder, never()).encode(registrationRequest.getPassword());
     }
 
 }
