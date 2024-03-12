@@ -1,6 +1,7 @@
 package FulfilmentService.entities;
 
 import FulfilmentService.dto.Address;
+import FulfilmentService.enums.DeliveryValetAvailability;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,6 +34,10 @@ public class User implements UserDetails {
 
     @Column(nullable = false)
     private Address address;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    private DeliveryValetAvailability availability = DeliveryValetAvailability.AVAILABLE;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -9,17 +9,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class UserControllerTest {
+@SpringBootTest
+@AutoConfigureMockMvc
+public class UserControllerTest {
 
     @MockBean
     private UserService userService;
@@ -36,6 +41,7 @@ class UserControllerTest {
 
     @BeforeEach
     void setup() throws JsonProcessingException {
+
         reset(userService);
         address = Address.builder()
                 .building(1)
@@ -55,6 +61,11 @@ class UserControllerTest {
                 .build();
         request = objectMapper.writeValueAsString(registrationRequest);
 
+    }
+
+    @Test
+    void testCalc(){
+        assertEquals(1,1);
     }
 
 
