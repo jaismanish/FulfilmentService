@@ -1,2 +1,4 @@
-package FulfilmentService.models;public class UserResponse {
+package FulfilmentService.models;
+
+public class UserResponse {
 }
