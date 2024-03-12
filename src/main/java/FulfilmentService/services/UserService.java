@@ -1,9 +1,10 @@
 package FulfilmentService.services;
 
-import FulfilmentService.models.UserRequest;
-import FulfilmentService.models.UserResponse;
+import FulfilmentService.dto.ApiResponse;
+import FulfilmentService.models.RegistrationRequest;
+import org.springframework.http.ResponseEntity;
 
 public interface UserService {
-    UserResponse register(UserRequest user);
+    ResponseEntity<ApiResponse> register(RegistrationRequest request);
 
 }

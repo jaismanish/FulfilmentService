@@ -1,6 +1,7 @@
 package FulfilmentService.controllers;
 
 import FulfilmentService.dto.ApiResponse;
+import FulfilmentService.models.RegistrationRequest;
 import FulfilmentService.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

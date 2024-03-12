@@ -1,8 +1,7 @@
 package FulfilmentService.services;
 
 import FulfilmentService.dto.ApiResponse;
-import FulfilmentService.models.UserRequest;
-import FulfilmentService.models.UserResponse;
+import FulfilmentService.models.RegistrationRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.User;
@@ -11,7 +10,7 @@ import java.util.Map;
 
 public class UserServiceImpl implements UserService{
     @Override
-    public UserResponse register(UserRequest user) {
+    public ResponseEntity<ApiResponse> register(RegistrationRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new UserAlreadyExistsException();
         }
@@ -33,4 +32,5 @@ public class UserServiceImpl implements UserService{
 
         return ResponseEntity.status(response.getStatus()).body(response);
     }
+
 }
